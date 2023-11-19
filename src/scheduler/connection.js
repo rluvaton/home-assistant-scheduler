@@ -51,7 +51,9 @@ function connect(triesLeft, resolve, reject) {
         // Reject if we no longer have to retry
         if (triesLeft === 0) {
             // We were never connected and will not retry
-            reject(ERR_CANNOT_CONNECT);
+            const error = new Error('Cannot connect, tries left is 0');
+            error.code = ERR_CANNOT_CONNECT;
+            reject(error);
             return;
         }
         const newTries = triesLeft === -1 ? -1 : triesLeft - 1;
@@ -125,9 +127,14 @@ function connect(triesLeft, resolve, reject) {
 let connection;
 
 export async function initConnection() {
-    connection = await createConnection({createSocket});
-    for (const eventName of ["disconnected", "ready", "reconnect-error"]) {
-        connection.addEventListener(eventName, () => console.log(`Event: ${ev}`));
+    try {
+        connection = await createConnection({createSocket});
+        for (const eventName of ["disconnected", "ready", "reconnect-error"]) {
+            connection.addEventListener(eventName, () => console.log(`Event: ${ev}`));
+        }
+    } catch (e) {
+        console.error('Failed to connect', {e});
+        process.exit(1);
     }
 }
 

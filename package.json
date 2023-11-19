@@ -2,10 +2,11 @@
   "name": "scheduler",
   "version": "1.0.0",
   "description": "",
-  "main": "scheduler/main.js",
+  "main": "./src/scheduler/main.js",
   "type": "module",
   "scripts": {
-    "start": "node scheduler/main.js",
+    "start": "node ./src/scheduler/main.js",
+    "start:docker": "docker run -it --rm --name scheduler scheduler",
     "migrate": "knex migrate:latest",
     "build:docker": "docker build -t scheduler --build-arg BUILD_FROM=alpine .",
     "test": "echo \"Error: no test specified\" && exit 1"

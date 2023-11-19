@@ -6,7 +6,6 @@ import {markTaskAsFinished} from "./one-time-task.js";
 await initConnection();
 
 // TODO - for the dashboard, we need to save it, or maybe have a list of currently pending tasks
-
 getFetcher()
     .map(async (task) => {
         try {

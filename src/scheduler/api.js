@@ -25,29 +25,34 @@ export async function getTasks() {
         })
     );
 }
+
 process.stdin.on('data', (data) => {
-  let parsed;
-
     try {
-        parsed = JSON.parse(data.toString());
-    } catch(e) {
-        console.error('Failed to parse', {data: data.toString()});
-        return;
+        let parsed;
+
+        try {
+            parsed = JSON.parse(data.toString());
+        } catch (e) {
+            console.error('Failed to parse', {data: data.toString()});
+            return;
+        }
+
+        console.log(parsed);
+
+        if (!parsed.runIn) {
+            console.error('Missing runIn');
+            return;
+        }
+
+        if (!parsed.actions?.length) {
+            console.error('Missing actions');
+            return;
+        }
+
+        save(parsed).catch(error => {
+            console.error('Failed to save', {error});
+        });
+    } catch (e) {
+        console.error('Failed to handle', {data: data.toString(), error: e});
     }
-
-    console.log(parsed);
-
-    if(!parsed.runIn) {
-        console.error('Missing runIn');
-        return;
-    }
-
-    if(!parsed.actions?.length) {
-        console.error('Missing actions');
-        return;
-    }
-
-    save(parsed).catch(error => {
-        console.error('Failed to save', {error});
-    });
 })
