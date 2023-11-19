@@ -7,6 +7,7 @@ import {
     ERR_CANNOT_CONNECT,
     ERR_INVALID_AUTH,
 } from "home-assistant-js-websocket";
+import {readFile} from "node:fs/promises";
 
 const atLeastHaVersion = (version, major, minor, patch) => {
     const [haMajor, haMinor, haPatch] = version.split(".", 3);
@@ -49,7 +50,15 @@ function connect(triesLeft, resolve, reject) {
         console.log("[Auth Phase] New connection", URL);
     }
     const socket = new WebSocket(URL);
-    const closeMessage = () => {
+    const closeMessage = async () => {
+
+        try {
+            const res = await readFile('/data/options.json', 'utf8');
+
+            console.log(res)
+        } catch (e) {
+            console.error('Failed to read options', {e});
+        }
         // If we are in error handler make sure close handler doesn't also fire.
         socket.removeEventListener("close", closeMessage);
         // Reject if we no longer have to retry
