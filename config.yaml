@@ -1,0 +1,25 @@
+name: "Scheduler Addon"
+description: "Scheduler for Home Assistant, which allow you to run one-time tasks"
+version: "1.0.0"
+url: "https://github.com/rluvaton/home-assistant-scheduler"
+slug: "scheduler"
+
+# Disabling the Docker default system init as we use dumb-init instead
+init: false
+
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+
+ports:
+  3000/tcp: 3000
+
+# Access the home assistant API (check again if needed)
+auth_api: true
+stdin: true
+
+# Run scripts
+homeassistant_api: true

@@ -8,39 +8,25 @@ export default {
     client: 'sqlite3',
     connection: {
       filename: './dev.sqlite3'
-    }
-  },
+    },
 
-  staging: {
-    client: 'postgresql',
-    connection: {
-      database: 'my_db',
-      user:     'username',
-      password: 'password'
-    },
-    pool: {
-      min: 2,
-      max: 10
-    },
     migrations: {
       tableName: 'knex_migrations'
-    }
+    },
+    useNullAsDefault: true
   },
-
   production: {
-    client: 'postgresql',
+    client: 'sqlite3',
+
     connection: {
-      database: 'my_db',
-      user:     'username',
-      password: 'password'
+      // /data folder is persistent across addon restarts
+      filename: '/data/db.sqlite3'
     },
-    pool: {
-      min: 2,
-      max: 10
-    },
+
     migrations: {
       tableName: 'knex_migrations'
-    }
-  }
+    },
 
+    useNullAsDefault: true
+  }
 };
