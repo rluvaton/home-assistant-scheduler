@@ -1,6 +1,6 @@
 name: "Scheduler Addon"
 description: "Scheduler for Home Assistant, which allow you to run one-time tasks"
-version: "1.0.5"
+version: "1.0.6"
 url: "https://github.com/rluvaton/home-assistant-scheduler"
 slug: "scheduler"
 
@@ -20,3 +20,6 @@ stdin: true
 
 # Run scripts
 homeassistant_api: true
+
+# TODO - remove if no needed Test
+hassio_api: true

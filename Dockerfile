@@ -19,7 +19,7 @@ RUN apk add dumb-init
 
 ENV NODE_ENV production
 ENV RUNNING_ON home-assistant
-ENV DEBUG 1
+ENV DEBUG *
 
 RUN mkdir /data
 
