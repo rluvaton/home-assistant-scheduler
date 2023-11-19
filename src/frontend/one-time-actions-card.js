@@ -113,7 +113,7 @@ class OneTimeActionsCard extends LitElement {
                 <div class="content">
                     <ha-card .header= ${"One time tasks"}>
                         <div class="card-content">
-                            
+
                             <!-- The run in time -->
                             <ha-form
                                     .data=${this.timeData}
@@ -127,7 +127,7 @@ class OneTimeActionsCard extends LitElement {
                                     @value-changed=${this.runInChanged}
                             >
                             </ha-form>
-                            
+
                             <br>
 
                             <!-- The actions to run when the time arrive -->
@@ -138,13 +138,14 @@ class OneTimeActionsCard extends LitElement {
                                     @value-changed=${this.onValueChanged}
                             ></ha-automation-action>
                         </div>
-                        
+
                         <div class="card-actions">
                             <!-- Add to one time runs -->
                             <mwc-button
                                     .disabled=${this.disabled}
                                     @click=${this.handleSubmit}
-                            >Submit</mwc-button>
+                            >Submit
+                            </mwc-button>
                         </div>
                     </ha-card>
                 </div>
@@ -163,6 +164,18 @@ class OneTimeActionsCard extends LitElement {
         });
 
         // TODO - add to one time tasks
+
+        this.hass.callWS({
+            type: "supervisor/api",
+            method: "POST",
+            data: {
+                actions: this.actions,
+                runIn: this.timeData
+            },
+
+            // TODO - this is temporary only and should be removed
+            endpoint: "/addons/ce16f137_scheduler/stdin"
+        });
     }
 
     static styles = css`
