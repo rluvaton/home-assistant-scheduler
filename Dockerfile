@@ -20,6 +20,8 @@ RUN apk add dumb-init
 ENV NODE_ENV production
 ENV RUNNING_ON home-assistant
 
+RUN mkdir /data
+
 WORKDIR /usr/src/app
 
 # Copy it before the code so Docker caching will help us build images faster

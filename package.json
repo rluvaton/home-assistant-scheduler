@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node scheduler/main.js",
     "migrate": "knex migrate:latest",
-    "build:docker": "docker build -t scheduler .",
+    "build:docker": "docker build -t scheduler --build-arg BUILD_FROM=alpine .",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
