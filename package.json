@@ -2,10 +2,10 @@
   "name": "scheduler",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "scheduler/main.js",
   "type": "module",
   "scripts": {
-    "start": "node index.js",
+    "start": "node scheduler/main.js",
     "migrate": "knex migrate:latest",
     "build:docker": "docker build -t scheduler .",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,11 +14,11 @@
   "author": "Raz Luvaton",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^20.9.1",
-    "knex": "^3.0.1"
+    "@types/node": "^20.9.1"
   },
   "dependencies": {
     "home-assistant-js-websocket": "^9.1.0",
+    "knex": "^3.0.1",
     "sqlite3": "^5.1.6",
     "ws": "^8.14.2"
   }

@@ -33,4 +33,4 @@ COPY . .
 
 RUN npm run migrate
 
-CMD [ "dumb-init", "node", "src/index.js" ]
+CMD [ "dumb-init", "node", "src/scheduler/main.js" ]
