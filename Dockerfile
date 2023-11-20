@@ -37,5 +37,5 @@ COPY . .
 
 RUN npm run migrate
 
-CMD [ "npm", "start" ]
+CMD "printenv"
 #CMD [ "dumb-init", "node", "src/scheduler/main.js" ]
