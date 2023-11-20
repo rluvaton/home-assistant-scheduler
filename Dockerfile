@@ -17,6 +17,7 @@ COPY --from=node /usr/local/bin /usr/local/bin
 # See more [here](https://snyk.io/blog/10-best-practices-to-containerize-nodejs-web-applications-with-docker/#:~:text=To%20quote%20the,our%20container%20image.)
 RUN apk add dumb-init
 
+ENV SUPERVISOR_TOKEN=$SUPERVISOR_TOKEN
 ENV NODE_ENV production
 ENV RUNNING_ON home-assistant
 ENV DEBUG *
