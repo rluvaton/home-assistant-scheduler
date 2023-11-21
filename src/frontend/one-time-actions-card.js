@@ -312,7 +312,6 @@ class OneTimeActionsCard extends LitElement {
                 }
             });
 
-            console.log(response);
             let body = response.content;
 
             try {
@@ -320,6 +319,11 @@ class OneTimeActionsCard extends LitElement {
             } catch (e) {
                 console.error('Failed to parse response body', body)
             }
+
+            console.log({
+                ...response,
+                body
+            });
 
             if (response.status_code >= 400) {
                 throw new HttpError({

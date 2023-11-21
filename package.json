@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node ./src/scheduler/main.js",
+    "start:prod": "NODE_ENV=production && npm run migrate && node ./src/scheduler/main.js",
     "start:docker": "docker run -it --rm --name scheduler scheduler",
     "migrate": "knex migrate:latest",
     "build:docker": "docker build -t scheduler --build-arg BUILD_FROM=alpine .",

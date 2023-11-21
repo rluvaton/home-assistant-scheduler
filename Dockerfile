@@ -37,4 +37,5 @@ COPY . .
 
 RUN npm run migrate
 
-CMD [ "dumb-init", "node", "src/scheduler/main.js" ]
+CMD [ "npm", "run", "start:prod" ]
+#CMD [ "dumb-init", "node", "src/scheduler/main.js" ]
