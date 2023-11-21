@@ -4,7 +4,7 @@ import {getPendingTasks} from "./one-time-task.js";
 
 let fetcher
 
-export function getFetcher() {
+export function getFetcher(abortSignal) {
     if (!fetcher) {
         fetcher = Readable.from((async function* fetch() {
             while (true) {
@@ -17,7 +17,7 @@ export function getFetcher() {
                 // TODO - should allow to exit without waiting for the sleep
                 await sleep(1000);
             }
-        })())
+        })(), {signal: abortSignal})
     }
 
     return fetcher;

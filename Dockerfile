@@ -38,4 +38,4 @@ COPY . .
 RUN npm run migrate
 
 CMD [ "npm", "run", "start:prod" ]
-#CMD [ "dumb-init", "node", "src/scheduler/main.js" ]
+#CMD [ "dumb-init", "node", "src/scheduler/entrypoint.js" ]

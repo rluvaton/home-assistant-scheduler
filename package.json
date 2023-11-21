@@ -5,12 +5,14 @@
   "main": "./src/scheduler/main.js",
   "type": "module",
   "scripts": {
-    "start": "node ./src/scheduler/main.js",
-    "start:prod": "NODE_ENV=production && npm run migrate && node ./src/scheduler/main.js",
+    "start": "node ./src/scheduler/entrypoint.js",
+    "start:prod": "NODE_ENV=production && npm run migrate && node ./src/scheduler/entrypoint.js",
     "start:docker": "docker run -it --rm --name scheduler scheduler",
     "migrate": "knex migrate:latest",
     "build:docker": "docker build -t scheduler --build-arg BUILD_FROM=alpine .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test:global-setup": "rm test.sqlite3 ; NODE_ENV=test npm run migrate",
+    "test": "npm run test:global-setup && NODE_ENV=test node --test ./src/scheduler/test/api.js",
+    "test:only": "npm run test:global-setup && NODE_ENV=test node --test --test-only ./src/scheduler/test/api.js"
   },
   "keywords": [],
   "author": "Raz Luvaton",
