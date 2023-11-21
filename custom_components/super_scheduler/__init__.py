@@ -64,23 +64,6 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
 # async def async_setup_entry(hass: HomeAssistantType, entry: ConfigEntry):
 #     return True
 
-async def async_http_request(url, method, data=None, headers=None):
-    if type(method) is not str:
-        raise TypeError("Method must be a string")
-
-    method = method.upper()
-    if method == "GET":
-        return requests.get(url, headers=headers)
-    elif method == "POST":
-        return requests.post(url, data=data, headers=headers)
-    elif method == "PUT":
-        return requests.put(url, data=data, headers=headers)
-    elif method == "DELETE":
-        return requests.delete(url, headers=headers)
-    elif method == "PATCH":
-        return requests.patch(url, data=data, headers=headers)
-    else:
-        raise ValueError("Unsupported HTTP method")
 
 @websocket_api.websocket_command(
     {
@@ -98,17 +81,26 @@ async def ws_proxy_http(
     response = None
 
     headers = msg["headers"] if "headers" in msg else None
-    data = msg["data"] if "data" in msg else None
 
     _LOGGER.info(f"ws_proxy_http: {msg}")
 
-    try:
-        response = await hass.async_add_executor_job(lambda: async_http_request(msg["url"], msg["method"], data, headers))
-    except Exception as e:
+    if msg["method"] == "GET":
+        response = await hass.async_add_executor_job(lambda: requests.get(msg["url"], headers=headers))
+    elif msg["method"] == "POST":
+        response = await hass.async_add_executor_job(lambda: requests.post(msg["url"], data=msg["data"], headers=headers))
+    elif msg["method"] == "PUT":
+        response = await hass.async_add_executor_job(lambda: requests.put(msg["url"], data=msg["data"], headers=headers))
+    elif msg["method"] == "DELETE":
+        response = await hass.async_add_executor_job(lambda: requests.delete(msg["url"], headers=headers))
+    elif msg["method"] == "PATCH":
+        response = await hass.async_add_executor_job(lambda: requests.patch(msg["url"], data=msg["data"], headers=headers))
+    else:
         connection.send_error(
-            msg["id"], "request_failed", f"Request failed: {e}"
+            msg["id"], "method_not_supported", "Method not supported"
         )
         return
+
+    _LOGGER.info(f"ws_proxy_http response: {response}")
 
     connection.send_result(
         msg["id"],
