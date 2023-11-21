@@ -13,9 +13,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType, ConfigType, ServiceCallType
-from homeassistant.core import (
-    SupportsResponse
-)
+# from homeassistant.core import (
+#     SupportsResponse
+# )
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -51,8 +51,7 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
         }
         pass
 
-    hass.services.async_register(DOMAIN, "get_one_time_tasks", get_one_time_tasks,
-          supports_response=SupportsResponse.ONLY)
+    hass.services.async_register(DOMAIN, "get_one_time_tasks", get_one_time_tasks)
 
     return True
 

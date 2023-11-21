@@ -114,3 +114,4 @@ debug/
 
 *.sqlite3
 .pytest_cache/
+venv
