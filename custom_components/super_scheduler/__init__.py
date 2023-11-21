@@ -4,3 +4,5 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 _LOGGER.info("RUNNING!!!!!!!!!!!!!!!!!!")
+
+import . import main
