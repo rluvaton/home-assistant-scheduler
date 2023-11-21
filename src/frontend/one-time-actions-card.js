@@ -306,7 +306,10 @@ class OneTimeActionsCard extends LitElement {
                 type: 'proxy-to-local-home-assistant-network/http',
                 method: method.toUpperCase(),
                 url: `${this.addonBaseUrl}${url}`,
-                data: JSON.stringify(data)
+                data: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
 
             console.log(response);

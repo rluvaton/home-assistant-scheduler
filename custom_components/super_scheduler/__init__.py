@@ -83,15 +83,15 @@ async def ws_proxy_http(
     headers = msg["headers"] if "headers" in msg else None
 
     if msg["method"] == "GET":
-        response = await hass.async_add_executor_job(requests.get, msg["url"], headers=headers)
+        response = await hass.async_add_executor_job(requests.get, msg["url"])
     elif msg["method"] == "POST":
-        response = await hass.async_add_executor_job(requests.post, msg["url"], data=msg["data"], headers=headers)
+        response = await hass.async_add_executor_job(requests.post, msg["url"], data=msg["data"])
     elif msg["method"] == "PUT":
-        response = await hass.async_add_executor_job(requests.put, msg["url"], data=msg["data"], headers=headers)
+        response = await hass.async_add_executor_job(requests.put, msg["url"], data=msg["data"])
     elif msg["method"] == "DELETE":
-        response = await hass.async_add_executor_job(requests.delete, msg["url"], headers=headers)
+        response = await hass.async_add_executor_job(requests.delete, msg["url"])
     elif msg["method"] == "PATCH":
-        response = await hass.async_add_executor_job(requests.patch, msg["url"], data=msg["data"], headers=headers)
+        response = await hass.async_add_executor_job(requests.patch, msg["url"], data=msg["data"])
     else:
         connection.send_error(
             msg["id"], "method_not_supported", "Method not supported"
