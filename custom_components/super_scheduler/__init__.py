@@ -4,6 +4,7 @@ import asyncio
 import logging
 from typing import Union
 from urllib.parse import urlencode, urljoin
+import json
 
 from aiohttp import web
 from homeassistant.components.camera import async_get_image
@@ -123,44 +124,49 @@ class WebSocketView(HomeAssistantView):
 
         hass = request.app["hass"]
 
-        if "poster" in params:
-            return await ws_poster(hass, params)
+        # if "poster" in params:
+        #     return await ws_poster(hass, params)
 
         ws_server = web.WebSocketResponse(autoclose=False, autoping=False)
         # ws_server.set_cookie(HLS_COOKIE, HLS_SESSION)
         await ws_server.prepare(request)
 
-        try:
-            url = await ws_connect(hass, params)
-
-            remote = request.headers.get("X-Forwarded-For")
-            remote = remote + ", " + request.remote if remote else request.remote
-
-            # https://www.nginx.com/resources/wiki/start/topics/examples/forwarded/
-            async with async_get_clientsession(hass).ws_connect(
-                    url,
-                    autoclose=False,
-                    autoping=False,
-                    headers={
-                        "User-Agent": request.headers.get("User-Agent"),
-                        "X-Forwarded-For": remote,
-                        "X-Forwarded-Host": request.host,
-                        "X-Forwarded-Proto": request.scheme,
-                    },
-            ) as ws_client:
-                # Proxy requests
-                await asyncio.wait(
-                    [
-                        asyncio.create_task(_websocket_forward(ws_server, ws_client)),
-                        asyncio.create_task(_websocket_forward(ws_client, ws_server)),
-                    ],
-                    return_when=asyncio.FIRST_COMPLETED,
-                )
-
-        except Exception as e:
-            await ws_server.send_json({
-                "type": "error",
-                "value": str(e)
-            })
+        await ws_server.send_json({
+            "type": "data",
+            "value": json.dumps(request.__dict__)
+        })
+        #
+        # try:
+        #     url = await ws_connect(hass, params)
+        #
+        #     remote = request.headers.get("X-Forwarded-For")
+        #     remote = remote + ", " + request.remote if remote else request.remote
+        #
+        #     # https://www.nginx.com/resources/wiki/start/topics/examples/forwarded/
+        #     async with async_get_clientsession(hass).ws_connect(
+        #             url,
+        #             autoclose=False,
+        #             autoping=False,
+        #             headers={
+        #                 "User-Agent": request.headers.get("User-Agent"),
+        #                 "X-Forwarded-For": remote,
+        #                 "X-Forwarded-Host": request.host,
+        #                 "X-Forwarded-Proto": request.scheme,
+        #             },
+        #     ) as ws_client:
+        #         # Proxy requests
+        #         await asyncio.wait(
+        #             [
+        #                 asyncio.create_task(_websocket_forward(ws_server, ws_client)),
+        #                 asyncio.create_task(_websocket_forward(ws_client, ws_server)),
+        #             ],
+        #             return_when=asyncio.FIRST_COMPLETED,
+        #         )
+        #
+        # except Exception as e:
+        #     await ws_server.send_json({
+        #         "type": "error",
+        #         "value": str(e)
+        #     })
 
         return ws_server
