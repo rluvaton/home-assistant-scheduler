@@ -1,7 +1,7 @@
 {
   "domain": "super_scheduler",
   "name": "Scheduler",
-  "integration_type": "service",
+  "integration_type": "hub",
   "dependencies": [],
   "codeowners": [
     "@rluvaton"
@@ -9,5 +9,5 @@
   "requirements": [
     "aiohttp~=3.8.1"
   ],
-  "version": "1.0.3"
+  "version": "1.0.4"
 }

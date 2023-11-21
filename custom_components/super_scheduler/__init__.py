@@ -109,8 +109,8 @@ async def ws_poster(hass: HomeAssistantType, params: dict) -> web.Response:
 
 
 class WebSocketView(HomeAssistantView):
-    url = "/api/scheduler/ws"
-    name = "api:scheduler:ws"
+    url = f"/api/{DOMAIN}/ws"
+    name = f"api:{DOMAIN}:ws"
     requires_auth = False
 
     async def get(self, request: web.Request):
