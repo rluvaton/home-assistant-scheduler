@@ -70,7 +70,7 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
         vol.Required("type"): "proxy-to-local-home-assistant-network/http",
         vol.Required("method"): str,
         vol.Required("url"): str,
-        # vol.Optional("headers"): dict,
+        vol.Optional("headers"): dict,
         vol.Optional("data"): str,
     }
 )
@@ -80,16 +80,18 @@ async def ws_proxy_http(
 ) -> None:
     response = None
 
+    headers = msg["headers"] if "headers" in msg else {}
+
     if msg["method"] == "GET":
-        response = await hass.async_add_executor_job(requests.get, msg["url"])
+        response = await hass.async_add_executor_job(requests.get, msg["url"], headers=headers)
     elif msg["method"] == "POST":
-        response = await hass.async_add_executor_job(requests.post, msg["url"], data=msg["data"])
+        response = await hass.async_add_executor_job(requests.post, msg["url"], data=msg["data"], headers=headers)
     elif msg["method"] == "PUT":
-        response = await hass.async_add_executor_job(requests.put, msg["url"], data=msg["data"])
+        response = await hass.async_add_executor_job(requests.put, msg["url"], data=msg["data"], headers=headers)
     elif msg["method"] == "DELETE":
-        response = await hass.async_add_executor_job(requests.delete, msg["url"])
+        response = await hass.async_add_executor_job(requests.delete, msg["url"], headers=headers)
     elif msg["method"] == "PATCH":
-        response = await hass.async_add_executor_job(requests.patch, msg["url"], data=msg["data"])
+        response = await hass.async_add_executor_job(requests.patch, msg["url"], data=msg["data"], headers=headers)
     else:
         connection.send_error(
             msg["id"], "method_not_supported", "Method not supported"
