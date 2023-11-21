@@ -18,9 +18,8 @@ COPY --from=node /usr/local/bin /usr/local/bin
 RUN apk add dumb-init
 
 ENV SUPERVISOR_TOKEN=$SUPERVISOR_TOKEN
-ENV NODE_ENV production
-ENV RUNNING_ON home-assistant
-ENV DEBUG *
+ENV NODE_ENV=production
+#ENV DEBUG *
 
 RUN mkdir /data
 
@@ -35,7 +34,6 @@ RUN npm ci --only=production
 # Copy local code to the container image.
 COPY . .
 
-RUN npm run migrate
+RUN chmod +x run-addon.sh
 
-CMD [ "npm", "run", "start:prod" ]
-#CMD [ "dumb-init", "node", "src/scheduler/entrypoint.js" ]
+CMD [ "dumb-init", "./run-addon.sh" ]
