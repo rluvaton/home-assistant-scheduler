@@ -1,6 +1,6 @@
 name: "Scheduler Addon"
 description: "Scheduler for Home Assistant, which allow you to run one-time tasks"
-version: "1.0.23"
+version: "1.0.24"
 url: "https://github.com/rluvaton/home-assistant-scheduler"
 slug: "scheduler"
 

@@ -57,10 +57,23 @@ export function setup() {
 
         const msToAdd = runIn.hours * 60 * 60 * 1000 + runIn.minutes * 60 * 1000 + runIn.seconds * 1000;
 
-        return await addTask({
+        req.log.info({
+            runIn,
             actions,
-            dateToRun: new Date(Date.now() + msToAdd)
+            millisecondsToAdd: msToAdd
+        }, 'Adding task');
+
+        const task = await addTask({
+            actions,
+            msToAdd
         });
+
+        req.log.info({
+            task,
+            expected_run_at: new Date(task.execution_date).toISOString()
+        }, 'Task added');
+
+        return task;
     });
 
     fastify.get('/one-time-tasks', async () => {

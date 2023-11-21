@@ -2,10 +2,14 @@
 
 import {knex} from "./db.js";
 
+/**
+ *
+ * @return {Promise<Task[]>}
+ */
 export async function getPendingTasks() {
     const result = await knex("one-time")
         .where("finished", false)
-        .andWhere("execution_date", "<", knex.fn.now());
+        .andWhereRaw("execution_date < unixEpoch() * 1000");
 
     return result.map(item => ({
         ...item,
@@ -24,14 +28,21 @@ export async function markTaskAsFinished(id, failed) {
         });
 }
 
-export async function addTask({actions, dateToRun}) {
-    return await knex("one-time").insert({
+/**
+ *
+ * @param {unknown[]} actions
+ * @param {number} msToAdd
+ * @return {Promise<Task>}
+ */
+export async function addTask({actions, msToAdd}) {
+    return (await knex("one-time").insert({
         // must stringify as sqlite client does not convert it automatically
         actions: JSON.stringify(actions),
-        execution_date: dateToRun,
+        execution_date: knex.raw(`unixEpoch() * 1000 + ${msToAdd}`),
 
         finished: false,
         executed: null,
         failed: null
-    }).returning("*");
+    }).returning("*"));
 }
+
