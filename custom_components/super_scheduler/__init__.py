@@ -13,6 +13,9 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType, ConfigType, ServiceCallType
+from homeassistant.core import (
+    SupportsResponse
+)
 
 _LOGGER = logging.getLogger(__name__)
 
