@@ -4,18 +4,41 @@ import {knex} from "./db.js";
 
 /**
  *
- * @return {Promise<Task[]>}
+ * @param {knex.QueryBuilder} query
+ * @return {Task[]}
  */
-export async function getPendingTasks() {
-    const result = await knex("one-time")
-        .where("finished", false)
-        .andWhereRaw("execution_date < unixEpoch() * 1000");
+async function getTasks(query) {
+    const result = await query;
 
     return result.map(item => ({
         ...item,
         // must parse as sqlite client does not convert it automatically
         actions: JSON.parse(item.actions)
     }));
+}
+
+/**
+ *
+ * @return {Promise<Task[]>}
+ */
+export async function getTasksReadyToExecute() {
+    return getTasks(
+        knex("one-time")
+            .where("finished", false)
+            .andWhereRaw("execution_date <= unixEpoch() * 1000")
+    );
+}
+
+/**
+ *
+ * @return {Promise<Task[]>}
+ */
+export async function getFutureTasks() {
+    return getTasks(
+        knex("one-time")
+            .where("finished", false)
+            .andWhereRaw("execution_date > unixEpoch() * 1000")
+    );
 }
 
 export async function markTaskAsFinished(id, failed) {
@@ -43,6 +66,6 @@ export async function addTask({actions, msToAdd}) {
         finished: false,
         executed: null,
         failed: null
-    }).returning("*"));
+    }).returning("*"))[0];
 }
 

@@ -1,5 +1,5 @@
 import Fastify from "fastify";
-import {addTask, getPendingTasks} from "./one-time-task.js";
+import {addTask, getFutureTasks, getTasksReadyToExecute} from "./one-time-task.js";
 
 /**
  * @type {import('fastify').FastifyInstance}
@@ -68,10 +68,9 @@ export function setup() {
             msToAdd
         });
 
-        console.log(task);
-
         req.log.info({
             task,
+            now: new Date().toISOString(),
             expected_run_at: new Date(task.execution_date).toISOString()
         }, 'Task added');
 
@@ -79,7 +78,7 @@ export function setup() {
     });
 
     fastify.get('/one-time-tasks', async () => {
-        const data = await getPendingTasks();
+        const data = await getFutureTasks();
 
         return data.map(({id, actions, execution_date: executionDate}) => ({
                 id,

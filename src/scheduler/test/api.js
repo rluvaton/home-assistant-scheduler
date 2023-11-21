@@ -14,14 +14,12 @@ before(async ({signal}) => {
 
 after(async () => {
     await closeApi();
-
-    // import log from 'why-is-node-running';
-    // log() // logs out active handles that are keeping node running
+    await knex.destroy()
 });
 
-beforeEach(() => {
+beforeEach(async () => {
     // TODO - remove this cleanup it make it impossible to run tests in parallel
-    knex('one_time_tasks').truncate();
+    await knex('one-time').truncate();
 })
 
 describe('API', () => {
@@ -61,6 +59,7 @@ describe('API', () => {
 
             assert.equal(pendingTasks.length, 1);
 
+            assert.deepStrictEqual(pendingTasks[0].id, createdTask.id);
             assert.deepStrictEqual(pendingTasks[0].actions, body.actions);
         });
     });
