@@ -80,7 +80,7 @@ async def ws_proxy_http(
 ) -> None:
     response = None
 
-    headers = msg["headers"] if "headers" in msg else {}
+    headers = msg["headers"] if "headers" in msg else None
 
     if msg["method"] == "GET":
         response = await hass.async_add_executor_job(requests.get, msg["url"], headers=headers)
