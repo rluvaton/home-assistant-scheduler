@@ -81,15 +81,15 @@ async def ws_proxy_http(
     response = None
 
     if msg["method"] == "GET":
-        response = requests.get(msg["url"])
+        response = await hass.async_add_executor_job(requests.get, msg["url"])
     elif msg["method"] == "POST":
-        response = requests.post(msg["url"], data=msg["data"])
+        response = await hass.async_add_executor_job(requests.post, msg["url"], data=msg["data"])
     elif msg["method"] == "PUT":
-        response = requests.put(msg["url"], data=msg["data"])
+        response = await hass.async_add_executor_job(requests.put, msg["url"], data=msg["data"])
     elif msg["method"] == "DELETE":
-        response = requests.delete(msg["url"])
+        response = await hass.async_add_executor_job(requests.delete, msg["url"])
     elif msg["method"] == "PATCH":
-        response = requests.patch(msg["url"], data=msg["data"])
+        response = await hass.async_add_executor_job(requests.patch, msg["url"], data=msg["data"])
     else:
         connection.send_error(
             msg["id"], "method_not_supported", "Method not supported"
