@@ -133,7 +133,7 @@ class WebSocketView(HomeAssistantView):
 
         await ws_server.send_json({
             "type": "data",
-            "value": json.dumps(request.__dict__)
+            "value": json.dumps(params.__dict__)
         })
         #
         # try:
