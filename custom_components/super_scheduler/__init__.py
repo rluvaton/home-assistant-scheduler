@@ -103,9 +103,7 @@ async def ws_proxy_http(
     _LOGGER.info(f"ws_proxy_http: {msg}")
 
     try:
-        response = await hass.async_add_executor_job(
-            async_http_request, msg["url"], msg["method"], data, headers
-        )
+        response = await async_http_request(msg["url"], msg["method"], data, headers)
     except Exception as e:
         connection.send_error(
             msg["id"], "request_failed", f"Request failed: {e}"
