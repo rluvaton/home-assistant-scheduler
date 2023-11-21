@@ -113,3 +113,4 @@ debug/
 .fleet
 
 *.sqlite3
+.pytest_cache/

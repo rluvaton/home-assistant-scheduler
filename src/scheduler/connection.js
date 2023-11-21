@@ -7,7 +7,6 @@ import {
     ERR_CANNOT_CONNECT,
     ERR_INVALID_AUTH,
 } from "home-assistant-js-websocket";
-import {readFile} from "node:fs/promises";
 
 const atLeastHaVersion = (version, major, minor, patch) => {
     const [haMajor, haMinor, haPatch] = version.split(".", 3);
