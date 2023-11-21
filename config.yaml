@@ -1,6 +1,6 @@
 name: "Scheduler Addon"
 description: "Scheduler for Home Assistant, which allow you to run one-time tasks"
-version: "1.0.20"
+version: "1.0.21"
 url: "https://github.com/rluvaton/home-assistant-scheduler"
 slug: "scheduler"
 
@@ -16,7 +16,6 @@ arch:
 
 # Access the home assistant API (check again if needed)
 auth_api: true
-stdin: true
 
 # Run scripts
 homeassistant_api: true
