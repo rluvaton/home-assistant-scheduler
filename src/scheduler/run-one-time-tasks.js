@@ -16,7 +16,7 @@ export async function run(abortSignal) {
         // Large concurrency because we want to execute as many tasks as possible as some executing can be to wait for a week or more
         // When we gonna need an actual solution for this we can avoid waiting for response for example
         .map(executeTask, {concurrency: 10_000})
-        .map(markTaskAsFinished)
+        .map(safeMarkTaskAsFinished)
         .drop(Infinity)
         .toArray();
 }
@@ -41,7 +41,7 @@ async function executeTask(task) {
     }
 }
 
-async function markTaskAsFinished({task, error}) {
+async function safeMarkTaskAsFinished({task, error}) {
     try {
         await markTaskAsFinished(task.id, !!error);
     } catch (err) {
