@@ -1,13 +1,13 @@
 {
   "domain": "super_scheduler",
   "name": "Scheduler",
-  "dependencies": [],
+  "dependencies": [
+    "http"
+  ],
   "codeowners": [
     "@rluvaton"
   ],
   "requirements": [
-    "voluptuous~=0.13.1",
-    "aiohttp~=3.8.1"
   ],
-  "version": "1.0.1"
+  "version": "1.0.2"
 }
