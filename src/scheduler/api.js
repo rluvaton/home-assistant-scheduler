@@ -42,11 +42,6 @@ fastify.addHook('preHandler', function (req, reply, done) {
     done()
 });
 
-await fastify.listen({
-    port: 3000,
-    host: '0.0.0.0'
-});
-
 fastify.post('/one-time-tasks', async (req, res) => {
     const {runIn, actions} = req.body;
 
@@ -69,34 +64,7 @@ fastify.get('/one-time-tasks', async () => {
     );
 });
 
-
-// process.stdin.on('data', (data) => {
-//     try {
-//         let parsed;
-//
-//         try {
-//             parsed = JSON.parse(data.toString());
-//         } catch (e) {
-//             console.error('Failed to parse', {data: data.toString()});
-//             return;
-//         }
-//
-//         console.log(parsed);
-//
-//         if (!parsed.runIn) {
-//             console.error('Missing runIn');
-//             return;
-//         }
-//
-//         if (!parsed.actions?.length) {
-//             console.error('Missing actions');
-//             return;
-//         }
-//
-//         save(parsed).catch(error => {
-//             console.error('Failed to save', {error});
-//         });
-//     } catch (e) {
-//         console.error('Failed to handle', {data: data.toString(), error: e});
-//     }
-// })
+await fastify.listen({
+    port: 3000,
+    host: '0.0.0.0'
+});
