@@ -1,33 +1,6 @@
 import Fastify from "fastify";
 import {addTask, getPendingTasks} from "./one-time-task.js";
 
-/**
- *
- * @param {{hours: number, minutes: number, seconds: number}} runIn
- * @param actions
- */
-export async function save({runIn, actions}) {
-    const msToAdd = runIn.hours * 60 * 60 * 1000 + runIn.minutes * 60 * 1000 + runIn.seconds * 1000;
-
-    await addTask({
-        actions,
-        dateToRun: new Date(Date.now() + msToAdd)
-    });
-}
-
-
-export async function getTasks() {
-    const data = await getPendingTasks();
-
-    return data.map(({id, actions, execution_date: executionDate}) => ({
-            id,
-            actions,
-            executionDate
-        })
-    );
-}
-
-
 const fastify = Fastify({
     disableRequestLogging: true,
     logger: {
@@ -69,25 +42,32 @@ fastify.addHook('preHandler', function (req, reply, done) {
     done()
 });
 
-// Not setting OPTIONS as it is handled by cors plugin
-['delete', 'get', 'post', 'put', 'patch', 'head'].map(method => {
-    fastify[method]('*', handleApi);
-})
-async function handleApi(req, res) {
-    return {
-        method: req.method,
-        url: req.url,
-        query: req.query,
-        headers: req.headers,
-        body: req.body,
-    };
-}
-
 await fastify.listen({
     port: 3000,
     host: '0.0.0.0'
 });
 
+fastify.post('/one-time-tasks', async (req, res) => {
+    const {runIn, actions} = req.body;
+
+    const msToAdd = runIn.hours * 60 * 60 * 1000 + runIn.minutes * 60 * 1000 + runIn.seconds * 1000;
+
+    return await addTask({
+        actions,
+        dateToRun: new Date(Date.now() + msToAdd)
+    });
+});
+
+fastify.get('/one-time-tasks', async () => {
+    const data = await getPendingTasks();
+
+    return data.map(({id, actions, execution_date: executionDate}) => ({
+            id,
+            actions,
+            executionDate
+        })
+    );
+});
 
 
 // process.stdin.on('data', (data) => {

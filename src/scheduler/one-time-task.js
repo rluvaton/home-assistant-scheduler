@@ -19,12 +19,12 @@ export async function markTaskAsFinished(id, failed) {
 }
 
 export async function addTask({actions, dateToRun}) {
-    await knex("one-time").insert({
+    return await knex("one-time").insert({
         actions,
         execution_date: dateToRun,
 
         finished: false,
         executed: null,
         failed: null
-    });
+    }).returning("*");
 }
