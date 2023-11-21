@@ -17,7 +17,7 @@ export function getFetcher() {
                 // TODO - should allow to exit without waiting for the sleep
                 await sleep(1000);
             }
-        }))
+        })())
     }
 
     return fetcher;
