@@ -1,22 +1,25 @@
 # https://community.home-assistant.io/t/how-can-a-custom-card-talk-to-a-custom-add-on/642984/15
 
 import asyncio
+import base64
 import logging
 from typing import Union
 from urllib.parse import urlencode, urljoin
 import json
 
+import requests
 from aiohttp import web
+import voluptuous as vol
 from homeassistant.components.camera import async_get_image
 from homeassistant.components.hassio.ingress import _websocket_forward
 from homeassistant.components.http import HomeAssistantView
+from homeassistant.components.websocket_api import ActiveConnection
 from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.helpers.template import Template
 from homeassistant.helpers.typing import HomeAssistantType, ConfigType, ServiceCallType
-# from homeassistant.core import (
-#     SupportsResponse
-# )
+from homeassistant.components import websocket_api
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -53,6 +56,7 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
         pass
 
     hass.services.async_register(DOMAIN, "get_one_time_tasks", get_one_time_tasks)
+    hass.components.websocket_api.async_register_command(ws_proxy_http)
 
     return True
 
@@ -61,54 +65,45 @@ async def async_setup(hass: HomeAssistantType, config: ConfigType):
 #     return True
 
 
-async def ws_connect(hass: HomeAssistantType, params: dict) -> str:
-    _LOGGER.info("ws_connect")
-    # 1. Server URL from card param
-    server: str = params.get("server")
-    # 2. Server URL from integration settings
-    if not server:
-        server: Union[str, Server] = hass.data[DOMAIN]
-    # 3. Server is manual binary
-    if isinstance(server, Server):
-        assert server.available, "WebRTC server not available"
-        server = "http://localhost:1984/"
+@websocket_api.websocket_command(
+    {
+        vol.Required("type"): "proxy-to-local-home-assistant-network/http",
+        vol.Required("method"): str,
+        vol.Required("url"): str,
+        # vol.Optional("headers"): dict,
+        vol.Optional("data"): str,
+    }
+)
+@websocket_api.async_response
+async def ws_proxy_http(
+        hass: HomeAssistant, connection: ActiveConnection, msg: dict
+) -> None:
+    response = None
 
-    if name := params.get("entity"):
-        src = await utils.get_stream_source(hass, name)
-        assert src, f"Can't get URL for {name}"
-        query = {"src": src, "name": name}
-    elif src := params.get("url"):
-        if "{{" in src or "{%" in src:
-            src = Template(src, hass).async_render()
-        query = {"src": src}
+    if msg["method"] == "GET":
+        response = requests.get(msg["url"])
+    elif msg["method"] == "POST":
+        response = requests.post(msg["url"], data=msg["data"])
+    elif msg["method"] == "PUT":
+        response = requests.put(msg["url"], data=msg["data"])
+    elif msg["method"] == "DELETE":
+        response = requests.delete(msg["url"])
+    elif msg["method"] == "PATCH":
+        response = requests.patch(msg["url"], data=msg["data"])
     else:
-        raise Exception("Missing url or entity")
+        connection.send_error(
+            msg["id"], "method_not_supported", "Method not supported"
+        )
+        return
 
-    return urljoin("ws" + server[4:], "api/ws") + "?" + urlencode(query)
-
-
-async def ws_poster(hass: HomeAssistantType, params: dict) -> web.Response:
-    _LOGGER.info("ws_poster")
-
-    poster: str = params["poster"]
-
-    if "{{" in poster or "{%" in poster:
-        # support Jinja2 tempaltes inside poster
-        poster = Template(poster, hass).async_render()
-
-    if poster.startswith("camera."):
-        # support entity_id as poster
-        image = await async_get_image(hass, poster)
-        return web.Response(body=image.content, content_type=image.content_type)
-
-    # support poster from go2rtc stream name
-    entry = hass.data[DOMAIN]
-    url = "http://localhost:1984/" if isinstance(entry, Server) else entry
-    url = urljoin(url, "api/frame.jpeg") + "?" + urlencode({"src": poster})
-
-    async with async_get_clientsession(hass).get(url) as r:
-        body = await r.read()
-        return web.Response(body=body, content_type=r.content_type)
+    connection.send_result(
+        msg["id"],
+        {
+            "status_code": response.status_code,
+            "headers": dict(response.headers),
+            "content": response.content.decode("utf-8"),
+        },
+    )
 
 
 class WebSocketView(HomeAssistantView):

@@ -146,17 +146,17 @@ export async function initConnection() {
         }
     } catch (e) {
         console.error('Failed to connect', {e});
-        process.exit(1);
+        // process.exit(1);
     }
 }
 
 export function getConnection() {
-    if (!connection) {
-        throw new Error('Should call init first, not initialized');
-    }
-
-    if (!connection.connected) {
-        throw new Error('Home Assistant connection is not connected');
-    }
+    // if (!connection) {
+    //     throw new Error('Should call init first, not initialized');
+    // }
+    //
+    // if (!connection.connected) {
+    //     throw new Error('Home Assistant connection is not connected');
+    // }
     return connection;
 }

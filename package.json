@@ -18,8 +18,11 @@
     "@types/node": "^20.9.1"
   },
   "dependencies": {
+    "fastify": "^4.24.3",
     "home-assistant-js-websocket": "^9.1.0",
     "knex": "^3.0.1",
+    "pino": "^8.16.2",
+    "pino-pretty": "^10.2.3",
     "sqlite3": "^5.1.6",
     "ws": "^8.14.2"
   }
