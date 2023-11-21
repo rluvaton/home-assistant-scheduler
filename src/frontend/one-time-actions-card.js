@@ -82,6 +82,7 @@ class OneTimeActionsCard extends LitElement {
         minutes: 0,
         seconds: 0
     };
+    addonBaseUrl;
 
     static get properties() {
         return {
@@ -94,7 +95,6 @@ class OneTimeActionsCard extends LitElement {
         this.actions = ev.detail.value;
         this.requestUpdate();
     };
-
 
     runInChanged = (e) => {
         this.timeData = e.detail.value;
@@ -157,25 +157,20 @@ class OneTimeActionsCard extends LitElement {
         return this.actions.length === 0 || (this.timeData.hours === 0 && this.timeData.minutes === 0 && this.timeData.seconds === 0);
     }
 
-    handleSubmit() {
+    async handleSubmit() {
         console.log('submit was clicked', {
             actions: this.actions,
             runIn: this.timeData
         });
 
-        // TODO - add to one time tasks
-
-        this.hass.callWS({
-            type: "supervisor/api",
-            method: "POST",
-            data: {
+        try {
+            await this.saveOneTimeTask({
                 actions: this.actions,
                 runIn: this.timeData
-            },
-
-            // TODO - this is temporary only and should be removed
-            endpoint: "/addons/ce16f137_scheduler/stdin"
-        });
+            });
+        } catch (error) {
+            console.error('Failed to save one time task', error);
+        }
     }
 
     static styles = css`
@@ -267,6 +262,117 @@ class OneTimeActionsCard extends LitElement {
     async setConfig(config) {
         this.config = config;
         await waitForAutomationActionsComponentsToLoad(this);
+
+        try {
+            await this.assertCanSendRequests();
+        } catch (error) {
+            console.error('Failed to assert can send requests', error);
+        }
+    }
+
+    async saveOneTimeTask({runIn, actions}) {
+        const data = {
+            runIn,
+            actions
+        };
+
+        await this.sendPost('/one-time-tasks', data);
+    }
+
+    async sendGet(url) {
+        return this.sendRequestToSchedulerAddon({
+            method: 'GET',
+            url
+        });
+    }
+
+    async sendPost(url, data) {
+        return this.sendRequestToSchedulerAddon({
+            method: 'POST',
+            url,
+            data
+        });
+    }
+
+    async sendRequestToSchedulerAddon({
+                                          method,
+                                          url,
+                                          data
+                                      }) {
+        await this.assertCanSendRequests();
+
+        try {
+            const response = await this.hass.connection.sendMessagePromise({
+                type: 'proxy-to-local-home-assistant-network/http',
+                method: method.toUpperCase(),
+                url: `${this.addonBaseUrl}${url}`,
+                data
+            });
+
+            console.log(response);
+            let body = response.content;
+
+            try {
+                body = JSON.parse(body);
+            } catch (e) {
+                console.error('Failed to parse response body', body)
+            }
+
+            if (response.status_code >= 400) {
+                throw new HttpError({
+                    url,
+                    body,
+                    statusCode: response.status_code,
+                    method,
+                    message: 'Request failed'
+                })
+            }
+
+            return body;
+        } catch (err) {
+            if (err instanceof HttpError) {
+                throw err;
+            }
+
+            console.error('Message failed!', err);
+            throw new Error('Failed to send request to scheduler addon')
+        }
+    }
+
+    async assertCanSendRequests() {
+        if (this.addonBaseUrl) {
+            return;
+        }
+
+        let retries = 10;
+
+        while (!this.addonBaseUrl && retries-- > 0) {
+            if (!this.hass) {
+                await sleep(1000);
+            }
+
+            if (!this.hass) {
+                continue;
+            }
+
+            try {
+                const addonInfo = await this.hass.callWS({
+                    type: "supervisor/api",
+                    method: "GET",
+
+                    // TODO - Find a better way to get the hostname
+                    endpoint: "/addons/ce16f137_scheduler/info"
+                });
+
+                this.addonBaseUrl = `http://${addonInfo.hostname}:3000`;
+            } catch (err) {
+                console.error('Failed to get addon info', err);
+            }
+        }
+
+        if (!this.addonBaseUrl) {
+            throw new Error('Failed to get addon hostname, timed out');
+        }
     }
 }
 
@@ -306,4 +412,14 @@ function sleep(ms) {
     return new Promise(resolve => {
         setTimeout(resolve, ms);
     })
+}
+
+class HttpError extends Error {
+    constructor({url, method, body, statusCode, message}) {
+        super(message);
+        this.url = url;
+        this.method = method;
+        this.body = body;
+        this.statusCode = statusCode;
+    }
 }
