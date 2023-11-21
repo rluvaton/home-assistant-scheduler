@@ -51,13 +51,6 @@ function connect(triesLeft, resolve, reject) {
     const socket = new WebSocket(URL);
     const closeMessage = async () => {
 
-        try {
-            const res = await readFile('/data/options.json', 'utf8');
-
-            console.log(res)
-        } catch (e) {
-            console.error('Failed to read options', {e});
-        }
         // If we are in error handler make sure close handler doesn't also fire.
         socket.removeEventListener("close", closeMessage);
         // Reject if we no longer have to retry
