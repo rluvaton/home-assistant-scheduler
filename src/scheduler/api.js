@@ -68,6 +68,8 @@ export function setup() {
             msToAdd
         });
 
+        console.log(task);
+
         req.log.info({
             task,
             expected_run_at: new Date(task.execution_date).toISOString()

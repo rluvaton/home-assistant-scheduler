@@ -27,10 +27,8 @@ export const MSG_TYPE_AUTH_OK = "auth_ok";
 
 // The URL come from https://developers.home-assistant.io/docs/add-ons/communication#home-assistant-core
 const URL = 'ws://supervisor/core/websocket';
-
+// TODO - use pino
 process.env.DEBUG = process.env.DEBUG || true;
-
-console.log(process.env)
 
 /**
  * @return {Promise<WebSocket>}
